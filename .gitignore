@@ -1,0 +1,16 @@
+node_modules/
+.wrangler/
+.dev.vars
+*.p8
+.DS_Store
+.claude/
+
+# MapKit JS token — bound to your own domain, never commit
+public/mapkit-token.js
+
+# Large source assets / intermediate files
+headimg.png
+
+# Generated planning artefacts (not deployed; not part of the published site)
+checklist.csv
+checklist.md

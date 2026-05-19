@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>MD 2026: Foshan — Mission Day Map</title>
+  <meta name="description" content="Interactive map for Ingress Mission Day 2026 in Foshan — 24 missions, 155 portals, walking routes, and Apple Maps deeplinks for every stop.">
+  <meta name="theme-color" content="#ff4242">
+  <link rel="canonical" href="https://fsmd.szres.org/">
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/svg+xml" href="/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+
+  <!-- Open Graph (Telegram, Facebook, LINE, Discord, WeChat, …) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Foshan Mission Day 2026">
+  <meta property="og:title" content="MD 2026: Foshan — Mission Day Map">
+  <meta property="og:description" content="Interactive map for Ingress Mission Day 2026 in Foshan: 24 missions, 155 portals, walking routes, blog stories, and one-tap Apple Maps directions.">
+  <meta property="og:url" content="https://fsmd.szres.org/">
+  <meta property="og:image" content="https://fsmd.szres.org/og-image.png?v=2">
+  <meta property="og:image:secure_url" content="https://fsmd.szres.org/og-image.png?v=2">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="850">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:alt" content="FSMD logo over Apple Maps view of Foshan — Mission Day 2026">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="zh_CN">
+  <meta property="og:locale:alternate" content="ja_JP">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="MD 2026: Foshan — Mission Day Map">
+  <meta name="twitter:description" content="Interactive map for Ingress Mission Day 2026 in Foshan: 24 missions, 155 portals, walking routes, blog stories, and one-tap Apple Maps directions.">
+  <meta name="twitter:image" content="https://fsmd.szres.org/og-image.png?v=2">
+  <meta name="twitter:image:alt" content="FSMD logo over Apple Maps view of Foshan — Mission Day 2026">
+
+  <link rel="stylesheet" href="/style.css">
+  <!-- proxy-shim must load synchronously before mapkit.js so fetch/XHR
+       overrides are in place by the time MapKit makes its first request. -->
+  <script src="/proxy-shim.js"></script>
+  <script src="/mapkit-token.js"></script>
+  <script
+    src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"
+    crossorigin async data-callback="initMapKit"
+    data-libraries="map,annotations,overlays,services,geojson"></script>
+</head>
+<body>
+  <aside id="sidebar">
+    <header>
+      <h1 id="set-title">Loading…</h1>
+      <p id="set-meta"></p>
+    </header>
+
+    <div class="lang-switch" role="group" data-i18n-aria-label="languageAria" aria-label="Language">
+      <button type="button" data-lang="en">EN</button>
+      <button type="button" data-lang="zh">中文</button>
+      <button type="button" data-lang="ja">日本語</button>
+    </div>
+
+    <div class="controls">
+      <button id="show-all" type="button" data-i18n="showAll">Show full banner</button>
+      <button id="show-welcome" type="button" class="link-btn" data-i18n="showWelcome" data-i18n-aria-label="showWelcomeAria" aria-label="About this event">ℹ︎ About this event</button>
+    </div>
+
+    <ol id="mission-list" data-i18n-aria-label="missionsAria" aria-label="Missions"></ol>
+
+    <footer>
+      <p class="note" id="footer-hint" data-i18n="footerHint">Tap any mission to see details.</p>
+      <p class="note note-disclaimer" data-i18n="disclaimerShort">Unofficial · made by Shenzhen RES · not affiliated with Niantic or FSMD organisers.</p>
+    </footer>
+  </aside>
+
+  <main id="map" data-i18n-aria-label="mapAria" aria-label="Map"></main>
+
+  <div id="welcome" class="modal" hidden aria-modal="true" role="dialog" data-i18n-aria-label="welcomeAria" aria-label="Welcome">
+    <div class="modal-inner">
+      <button type="button" id="welcome-close" class="modal-close" data-i18n-aria-label="closeAria" aria-label="Close">×</button>
+      <h2 id="welcome-title" data-i18n="welcomeTitle">Welcome to FSMD 2026</h2>
+      <p class="welcome-lede" id="welcome-lede" data-i18n="welcomeLede">The Foshan Mission Day map — 24 missions across two zones, walkable as a 24-tile banner.</p>
+
+      <figure class="banner-figure" id="banner-figure">
+        <img id="banner-map" src="/banner-map.png" alt="Official Foshan Mission Day 2026 banner map" loading="eager"
+             onerror="this.closest('figure').hidden=true">
+        <figcaption id="banner-caption" data-i18n="bannerCaption">Official banner map · Operation Foshan · Ingress Mission Day 2026</figcaption>
+      </figure>
+
+      <section class="welcome-section">
+        <h3 data-i18n="contactSection">Channels</h3>
+        <ul class="link-list">
+          <li><a href="https://t.me/foshanmissionday" target="_blank" rel="noopener noreferrer">Telegram · xFac info channel ↗</a></li>
+          <li><a href="https://t.me/+KYnU71uX_fc1OWNl" target="_blank" rel="noopener noreferrer">Telegram · 中文交流群 ↗</a></li>
+          <li><a href="https://t.me/+4LCkotNud302ZDY1" target="_blank" rel="noopener noreferrer">Telegram · English group ↗</a></li>
+        </ul>
+      </section>
+
+      <section class="welcome-section">
+        <h3 data-i18n="blogsSection">Mission stories</h3>
+        <ul id="welcome-blogs" class="link-list">
+          <!-- populated by app.js -->
+        </ul>
+      </section>
+
+      <section class="welcome-section">
+        <h3 data-i18n="travelSection">Travel &amp; accommodation</h3>
+        <ul class="link-list">
+          <li><a href="https://missiondayfoshan.blogspot.com/2026/03/mission-day-beta1.html" target="_blank" rel="noopener noreferrer">✈︎ 🏨 Foshan MD travel guide (Beta) ↗</a></li>
+          <li><a href="https://missiondayfoshan.blogspot.com/2026/02/transportation-overview-accommodation.html" target="_blank" rel="noopener noreferrer">Transportation overview &amp; accommodation ↗</a></li>
+          <li><a href="https://missiondayfoshan.blogspot.com/2026/03/navigation.html" target="_blank" rel="noopener noreferrer">📑 All posts (blog index) ↗</a></li>
+        </ul>
+      </section>
+
+      <button type="button" id="welcome-enter" class="btn-primary" data-i18n="enterMap">Enter the map →</button>
+      <p class="disclaimer" data-i18n="disclaimer">Built by Shenzhen RES (Resistance) agents as a third-party companion to Mission Day Foshan. Not an official site — not affiliated with or endorsed by Niantic or the FSMD organisers.</p>
+    </div>
+  </div>
+
+  <aside id="detail" hidden>
+    <button id="detail-handle" type="button" class="sheet-handle" aria-expanded="true" data-i18n-aria-label="collapseAria" aria-label="Collapse panel"></button>
+    <button id="detail-close" type="button" data-i18n-aria-label="closeAria" aria-label="Close">×</button>
+    <h2 id="detail-title"></h2>
+    <div class="detail-actions">
+      <a id="open-in-maps" class="btn-primary" target="_blank" rel="noopener noreferrer">
+        View Area in Apple Maps ↗
+      </a>
+      <a id="open-blog" class="btn-secondary" target="_blank" rel="noopener noreferrer" hidden>
+        📖 Read mission blog ↗
+      </a>
+      <p class="hint" id="detail-hint" data-i18n="detailHint">Tap any portal to plan walking directions in Apple Maps.</p>
+    </div>
+    <ol id="detail-portals"></ol>
+  </aside>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "name": "fsmd",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "MD 2026: Foshan Ingress mission-day map (MapKit JS + Cloudflare Pages).",
+  "license": "MIT",
+  "homepage": "https://fsmd.szres.org",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/szres/mission-day-foshan.git"
+  },
+  "bugs": {
+    "url": "https://github.com/szres/mission-day-foshan/issues"
+  },
+  "scripts": {
+    "extract": "node scripts/extract.mjs",
+    "checklist": "node scripts/generate-checklist.mjs",
+    "build": "node scripts/extract.mjs && node scripts/generate-checklist.mjs",
+    "dev": "npx wrangler@latest pages dev public --compatibility-date=2025-06-01",
+    "deploy": "npm run build && npx wrangler@latest pages deploy public --project-name=fsmd"
+  }
+}
