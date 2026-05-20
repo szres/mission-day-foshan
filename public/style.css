@@ -708,13 +708,15 @@ body.modal-open { overflow: hidden; }
     border-radius: 2px;
     background: rgba(255,255,255,0.28);
   }
-  /* Close sits above the handle in the top-right corner so it remains
-     tappable in both expanded and collapsed (44px) states. */
+  /* Close sits above the handle AND the sticky title in the top-right
+     corner so it remains visible AND tappable in both expanded and
+     collapsed (44px) states. Must be a higher z-index than the sticky
+     #detail h2 (z:3) or the title's full-width box swallows the tap. */
   #detail-close {
     width: 36px; height: 32px;
     font-size: 22px;
     top: 4px; right: 6px;
-    z-index: 2;
+    z-index: 5;
   }
   /* font-size only — padding handled by the sticky-title rule above. */
   #detail h2 { font-size: 17px; }
