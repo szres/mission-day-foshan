@@ -434,6 +434,14 @@ function missionFullName(m) {
 }
 
 function selectMission(order, opts = {}) {
+  // Clear MapKit's currently-selected annotation BEFORE removing it from
+  // the map. Synchronously removing the annotation that the user just
+  // tapped leaves MapKit holding a dangling reference and locks up
+  // pan/zoom gestures until the next page load (reproducible on Safari,
+  // Firefox and Chrome).
+  if (state.map && state.map.selectedAnnotation) {
+    state.map.selectedAnnotation = null;
+  }
   state.selected = order;
   for (const li of els.list.children) {
     li.classList.toggle('active', li.dataset.order === String(order));
@@ -553,6 +561,9 @@ function buildBlogAnnotations() {
     );
     ann.addEventListener('select', e => {
       const u = e.target.data?.url;
+      // Deselect immediately so MapKit's gesture system isn't left in a
+      // "callout open" state while we navigate away.
+      if (state.map) state.map.selectedAnnotation = null;
       if (u) window.open(u, '_blank', 'noopener,noreferrer');
     });
     result.push(ann);
