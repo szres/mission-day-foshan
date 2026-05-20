@@ -49,6 +49,12 @@ const I18N = {
     missionMeta: (n, p, b) => `${n} missions · ${p} portals · banner ${b}`,
     disclaimer: 'Built by Shenzhen RES (Resistance) agents as a third-party companion to Mission Day Foshan. Not an official site — not affiliated with or endorsed by Niantic or the FSMD organisers.',
     disclaimerShort: 'Unofficial · made by Shenzhen RES · not affiliated with Niantic or FSMD organisers.',
+    coordChooserAria: 'Choose coordinate system',
+    coordChooserTitle: 'Open in Apple Maps',
+    coordChooserNote: "Apple Maps in mainland China renders against GCJ-02. Opening WGS-84 coordinates there shifts the pin by ~50–500 m. Choose GCJ-02 if you're in China, WGS-84 elsewhere.",
+    coordChooseWgs84: 'WGS-84 (global)',
+    coordChooseGcj02: 'GCJ-02 (China mainland)',
+    coordRememberSession: 'Remember my choice for this session',
   },
   zh: {
     htmlLang: 'zh-Hans',
@@ -89,6 +95,12 @@ const I18N = {
     missionMeta: (n, p, b) => `${n} 项任务 · ${p} 个据点 · 拼图 ${b}`,
     disclaimer: '本网站由深圳 RES(蓝军)特工社区制作,作为佛山任务日的第三方辅助工具发布。非官方网站,与 Niantic 公司及 FSMD 主办方均无任何关联或背书。',
     disclaimerShort: '非官方 · 由深圳 RES 制作 · 与 Niantic 及 FSMD 主办方无关',
+    coordChooserAria: '选择坐标系',
+    coordChooserTitle: '在 Apple 地图中打开',
+    coordChooserNote: '中国大陆的 Apple 地图采用 GCJ-02 坐标系,直接打开 WGS-84 坐标会出现约 50–500 米的偏移。若在中国大陆,请选择 GCJ-02;其他地区请选择 WGS-84。',
+    coordChooseWgs84: 'WGS-84(全球)',
+    coordChooseGcj02: 'GCJ-02(中国大陆)',
+    coordRememberSession: '本次会话记住我的选择',
   },
   ja: {
     htmlLang: 'ja',
@@ -129,6 +141,12 @@ const I18N = {
     missionMeta: (n, p, b) => `${n} ミッション · ${p} ポータル · バナー ${b}`,
     disclaimer: '本サイトは深圳 RES（レジスタンス）のエージェント有志が Foshan Mission Day のサードパーティ補助ツールとして制作した非公式サイトです。Niantic 社および FSMD 主催者とは一切関係ありません。',
     disclaimerShort: '非公式 · 深圳 RES 制作 · Niantic / FSMD 主催者とは無関係',
+    coordChooserAria: '座標系を選択',
+    coordChooserTitle: 'Apple マップで開く',
+    coordChooserNote: '中国本土の Apple マップは GCJ-02 座標系を使用しているため、WGS-84 のまま開くとピンが約 50〜500m ずれます。中国本土なら GCJ-02、それ以外の地域なら WGS-84 を選んでください。',
+    coordChooseWgs84: 'WGS-84（全世界）',
+    coordChooseGcj02: 'GCJ-02（中国本土）',
+    coordRememberSession: 'このセッションでは記憶する',
   },
 };
 
@@ -175,7 +193,18 @@ const els = {
   showWelcome: document.getElementById('show-welcome'),
   welcomeEnter:document.getElementById('welcome-enter'),
   welcomeClose:document.getElementById('welcome-close'),
+  coordChooser:document.getElementById('coord-chooser'),
+  coordTarget: document.getElementById('coord-chooser-target'),
+  coordWgs84:  document.getElementById('coord-choose-wgs84'),
+  coordGcj02:  document.getElementById('coord-choose-gcj02'),
+  coordRemember: document.getElementById('coord-chooser-remember'),
+  coordClose:  document.getElementById('coord-chooser-close'),
 };
+
+// Holds {kind, mission|portal, label} for whichever Apple Maps link the user
+// most recently tapped, so the chooser knows what URL to build for each
+// coordinate system. Reset every time the chooser opens.
+let pendingMapsRequest = null;
 
 // Apply i18n + wire the switcher before MapKit finishes loading, so the
 // chrome is in the right language from the first paint.
@@ -240,10 +269,17 @@ function bootstrapChrome() {
       toggleDetailCollapsed();
       return;
     }
+    // Coordinate-system chooser
+    if (target.closest('#coord-choose-wgs84')) { e.preventDefault(); pickCoordSystem('wgs84'); return; }
+    if (target.closest('#coord-choose-gcj02')) { e.preventDefault(); pickCoordSystem('gcj02'); return; }
+    if (target.closest('#coord-chooser-close')) { e.preventDefault(); closeCoordChooser(); return; }
+    if (target.id === 'coord-chooser') { closeCoordChooser(); return; }
   });
 
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && els.welcome && !els.welcome.hidden) closeWelcome();
+    if (e.key !== 'Escape') return;
+    if (els.coordChooser && !els.coordChooser.hidden) { closeCoordChooser(); return; }
+    if (els.welcome && !els.welcome.hidden) closeWelcome();
   });
 
   // Auto-open on first visit
@@ -623,10 +659,26 @@ function showDetailPanel(mission) {
   els.detailTitle.textContent = `${tr.missionPrefix} ${mission.order} · ${missionLabel(mission)}`;
   const guideUrl = state.guides[mission.order];
   if (guideUrl) {
+    // Pre-curated Apple Maps Guide — coords are already baked into the guide
+    // payload, so the chooser doesn't apply. Open directly.
     els.openInMaps.href = guideUrl;
+    els.openInMaps.target = '_blank';
+    els.openInMaps.onclick = null;
     els.openInMaps.textContent = tr.openGuide;
   } else {
-    els.openInMaps.href = appleMapsAreaUrl(mission);
+    // Defer URL building to chooser-pick time so we can honour the user's
+    // coordinate-system preference. We keep `href` set so right-click /
+    // long-press still gives a sensible link (defaulting to WGS-84).
+    const wgsHref = appleMapsAreaUrl(mission, 'wgs84');
+    els.openInMaps.href = wgsHref;
+    els.openInMaps.target = '_blank';
+    els.openInMaps.onclick = e => {
+      e.preventDefault();
+      openAppleMaps({
+        label: missionFullName(mission),
+        url: system => appleMapsAreaUrl(mission, system),
+      });
+    };
     els.openInMaps.textContent = tr.viewArea;
   }
   // Per-mission blog link
@@ -660,6 +712,13 @@ function showDetailPanel(mission) {
     li.querySelector('.portal-nav--ingress').addEventListener('click', () => {
       showToast(t().toastOpeningIngress);
     });
+    li.querySelector('.portal-nav--maps').addEventListener('click', e => {
+      e.preventDefault();
+      openAppleMaps({
+        label: p.title || 'Portal',
+        url: system => appleMapsPortalUrl(p, system),
+      });
+    });
     els.detailList.appendChild(li);
   }
   els.detail.hidden = false;
@@ -669,8 +728,13 @@ function showDetailPanel(mission) {
 // single destination, so we build two narrower links:
 //   appleMapsAreaUrl    — center+zoom on the mission's bounding box, no routing
 //   appleMapsPortalUrl  — walking directions from current location to one portal
+//
+// Both accept an optional `system` (`'wgs84'` | `'gcj02'`). Portal coords are
+// stored in WGS-84 (that's what Ingress exports); mainland-China Apple Maps
+// renders against GCJ-02, so passing WGS-84 there shifts the pin by ~50–500m.
+// The chooser lets the user pick which they want at click time.
 
-function appleMapsAreaUrl(mission) {
+function appleMapsAreaUrl(mission, system = 'wgs84') {
   let minLat=Infinity, maxLat=-Infinity, minLng=Infinity, maxLng=-Infinity;
   for (const p of mission.portals) {
     if (p.lat < minLat) minLat = p.lat;
@@ -678,23 +742,108 @@ function appleMapsAreaUrl(mission) {
     if (p.lng < minLng) minLng = p.lng;
     if (p.lng > maxLng) maxLng = p.lng;
   }
-  const lat = (minLat + maxLat) / 2;
-  const lng = (minLng + maxLng) / 2;
+  let lat = (minLat + maxLat) / 2;
+  let lng = (minLng + maxLng) / 2;
+  if (system === 'gcj02') ({ lat, lng } = wgs84ToGcj02(lat, lng));
   const span = Math.max(maxLat - minLat, maxLng - minLng);
   const z = zoomForSpan(span);
   const label = encodeURIComponent(missionFullName(mission));
   return `https://maps.apple.com/?ll=${lat},${lng}&q=${label}&z=${z}`;
 }
 
-function appleMapsPortalUrl(portal) {
+function appleMapsPortalUrl(portal, system = 'wgs84') {
+  let { lat, lng } = portal;
+  if (system === 'gcj02') ({ lat, lng } = wgs84ToGcj02(lat, lng));
   const label = encodeURIComponent(portal.title || 'Portal');
-  return `https://maps.apple.com/?daddr=${portal.lat},${portal.lng}&q=${label}&dirflg=w`;
+  return `https://maps.apple.com/?daddr=${lat},${lng}&q=${label}&dirflg=w`;
+}
+
+// ---------------------------------------------------------------------------
+// WGS-84 → GCJ-02 conversion (the "Mars coordinates" obfuscation that
+// mainland-China mapping providers — Amap, Apple Maps in China, Tencent — use
+// instead of raw WGS-84). Standard reference implementation, public domain.
+// Outside the rough China bounding box it's a no-op.
+// ---------------------------------------------------------------------------
+function wgs84ToGcj02(lat, lng) {
+  if (isOutOfChina(lat, lng)) return { lat, lng };
+  const a = 6378245.0;
+  const ee = 0.00669342162296594323;
+  let dLat = _trLat(lng - 105.0, lat - 35.0);
+  let dLng = _trLng(lng - 105.0, lat - 35.0);
+  const radLat = lat * Math.PI / 180.0;
+  const magic = Math.sin(radLat);
+  const magicSq = 1 - ee * magic * magic;
+  const sqrtMagic = Math.sqrt(magicSq);
+  dLat = (dLat * 180.0) / ((a * (1 - ee)) / (magicSq * sqrtMagic) * Math.PI);
+  dLng = (dLng * 180.0) / (a / sqrtMagic * Math.cos(radLat) * Math.PI);
+  return { lat: lat + dLat, lng: lng + dLng };
+}
+function isOutOfChina(lat, lng) {
+  return !(lng > 73.66 && lng < 135.05 && lat > 3.86 && lat < 53.55);
+}
+function _trLat(x, y) {
+  let r = -100.0 + 2.0*x + 3.0*y + 0.2*y*y + 0.1*x*y + 0.2*Math.sqrt(Math.abs(x));
+  r += (20.0*Math.sin(6.0*x*Math.PI) + 20.0*Math.sin(2.0*x*Math.PI)) * 2/3;
+  r += (20.0*Math.sin(y*Math.PI) + 40.0*Math.sin(y/3*Math.PI)) * 2/3;
+  r += (160.0*Math.sin(y/12*Math.PI) + 320.0*Math.sin(y*Math.PI/30)) * 2/3;
+  return r;
+}
+function _trLng(x, y) {
+  let r = 300.0 + x + 2.0*y + 0.1*x*x + 0.1*x*y + 0.1*Math.sqrt(Math.abs(x));
+  r += (20.0*Math.sin(6.0*x*Math.PI) + 20.0*Math.sin(2.0*x*Math.PI)) * 2/3;
+  r += (20.0*Math.sin(x*Math.PI) + 40.0*Math.sin(x/3*Math.PI)) * 2/3;
+  r += (150.0*Math.sin(x/12*Math.PI) + 300.0*Math.sin(x/30*Math.PI)) * 2/3;
+  return r;
 }
 
 // Ingress universal-link format. Opens the in-game scanner to the portal on
 // iOS/Android with Ingress installed; falls back to a web page otherwise.
 function ingressPortalUrl(portal) {
   return `https://link.ingress.com/portal/${portal.guid}`;
+}
+
+// ---------------------------------------------------------------------------
+// Coordinate-system chooser. Pops a small modal asking the user whether to
+// use WGS-84 or GCJ-02 before opening Apple Maps. The decision can be
+// remembered for the session (sessionStorage) to avoid pestering the user
+// on every portal tap.
+// ---------------------------------------------------------------------------
+function getRememberedCoordSystem() {
+  try { return sessionStorage.getItem('coordSystem'); } catch { return null; }
+}
+function rememberCoordSystem(system) {
+  try { sessionStorage.setItem('coordSystem', system); } catch { /* ignore */ }
+}
+
+function openAppleMaps({ label, url }) {
+  // url is a function (system: 'wgs84' | 'gcj02') => string, so the URL is
+  // built lazily after the chooser knows which system to use.
+  const remembered = getRememberedCoordSystem();
+  if (remembered === 'wgs84' || remembered === 'gcj02') {
+    window.open(url(remembered), '_blank', 'noopener,noreferrer');
+    return;
+  }
+  pendingMapsRequest = { url, label };
+  if (els.coordTarget) els.coordTarget.textContent = label;
+  if (els.coordRemember) els.coordRemember.checked = false;
+  els.coordChooser.hidden = false;
+  document.body.classList.add('modal-open');
+}
+
+function closeCoordChooser() {
+  if (!els.coordChooser) return;
+  els.coordChooser.hidden = true;
+  document.body.classList.remove('modal-open');
+  pendingMapsRequest = null;
+}
+
+function pickCoordSystem(system) {
+  const req = pendingMapsRequest;
+  if (!req) { closeCoordChooser(); return; }
+  if (els.coordRemember && els.coordRemember.checked) rememberCoordSystem(system);
+  const url = req.url(system);
+  closeCoordChooser();
+  window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 function sanitizeBlogs(raw) {

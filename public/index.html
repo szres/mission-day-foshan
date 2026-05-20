@@ -118,6 +118,35 @@
     </div>
   </div>
 
+  <!-- Coordinate-system chooser. Shown when the user taps an Open-in-Apple-Maps
+       button so they can pick between raw WGS-84 (correct globally, off in
+       mainland China) and converted GCJ-02 (correct in mainland China's
+       Apple Maps, off elsewhere). -->
+  <div id="coord-chooser" class="modal" hidden aria-modal="true" role="dialog"
+       data-i18n-aria-label="coordChooserAria" aria-label="Open in Apple Maps">
+    <div class="modal-inner coord-chooser-inner">
+      <button type="button" id="coord-chooser-close" class="modal-close"
+              data-i18n-aria-label="closeAria" aria-label="Close">×</button>
+      <h2 data-i18n="coordChooserTitle">Open in Apple Maps</h2>
+      <p id="coord-chooser-target" class="coord-chooser-target"></p>
+      <p class="coord-chooser-note" data-i18n="coordChooserNote">
+        Apple Maps in mainland China renders against GCJ-02. Opening WGS-84
+        coordinates there shifts the pin by ~50–500 m. Choose GCJ-02 if you're
+        in China, WGS-84 elsewhere.
+      </p>
+      <div class="coord-chooser-buttons">
+        <button type="button" id="coord-choose-wgs84" class="btn-secondary"
+                data-i18n="coordChooseWgs84">WGS-84 (global)</button>
+        <button type="button" id="coord-choose-gcj02" class="btn-primary"
+                data-i18n="coordChooseGcj02">GCJ-02 (China mainland)</button>
+      </div>
+      <label class="coord-chooser-remember">
+        <input type="checkbox" id="coord-chooser-remember">
+        <span data-i18n="coordRememberSession">Remember my choice for this session</span>
+      </label>
+    </div>
+  </div>
+
   <aside id="detail" hidden>
     <button id="detail-handle" type="button" class="sheet-handle" aria-expanded="true" data-i18n-aria-label="collapseAria" aria-label="Collapse panel"></button>
     <button id="detail-close" type="button" data-i18n-aria-label="closeAria" aria-label="Close">×</button>
