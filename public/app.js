@@ -392,9 +392,14 @@ async function bootstrap() {
     showsZoomControl: true,
     showsPointsOfInterest: false,
     isRotationEnabled: false,
-    isPitchEnabled: false,
     center: new mapkit.Coordinate(state.data.center.lat, state.data.center.lng),
   });
+
+  // Hidden debug handle. Lets you poke at the live state / map from the
+  // browser console (e.g. `__fsmd.map.cameraDistance = 500`). Harmless in
+  // production; intentionally double-underscored to discourage app code
+  // from depending on it.
+  if (typeof window !== 'undefined') window.__fsmd = state;
 
   fitToBounds(state.data.bounds);
   buildMissionList();
