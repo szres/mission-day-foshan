@@ -541,11 +541,25 @@ body.modal-open { overflow: hidden; }
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin-bottom: 12px;
+  align-items: stretch;
 }
+/* Normalise both buttons so the primary / secondary inheritance
+   differences (font-weight, border, default <button> metrics) don't
+   leave them at different heights side-by-side. */
 .coord-chooser-buttons .btn-primary,
 .coord-chooser-buttons .btn-secondary {
-  padding: 12px 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 10px 14px;
   font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+  border-width: 1px;
+  border-style: solid;
 }
 .coord-chooser-remember {
   display: flex;
