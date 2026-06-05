@@ -15,6 +15,9 @@ const I18N = {
     pageTitleSuffix: 'Mission Day Map',
     languageAria: 'Language',
     missionsAria: 'Missions',
+    viewSwitchAria: 'Mission view mode',
+    viewListAria: 'List view',
+    viewGridAria: 'Grid view',
     mapAria: 'Map',
     closeAria: 'Close',
     collapseAria: 'Collapse panel to see the map',
@@ -48,7 +51,7 @@ const I18N = {
     fatalNoToken: 'No MapKit token configured. Copy public/mapkit-token.example.js → public/mapkit-token.js and paste your JWT.',
     fatalAuth: 'Could not authenticate with MapKit.',
     missionMeta: (n, p, b) => `${n} missions · ${p} portals · banner ${b}`,
-    disclaimer: 'Built by Shenzhen RES (Resistance) agents as a third-party companion to Mission Day Foshan. Not an official site — not affiliated with or endorsed by Niantic Spatial or the FSMD organisers. Credits: mission set design © 佛山 MD 筹划组 (Foshan MD Organizing Committee); mission titles by Agent 茶几; mission banner artwork and event imagery by Agent HTMSK; portal data © Niantic Spatial Inc., used under the Ingress Terms of Service.',
+    disclaimer: 'Built by Shenzhen RES (Resistance) agents as a third-party companion to Mission Day Foshan. Not an official site — not affiliated with or endorsed by Niantic Spatial or the FSMD organisers. Credits: mission set design, titles and descriptions © 佛山 MD 筹划组 (Foshan MD Organizing Committee); mission banner artwork and event imagery by Agent HTMSK; portal data © Niantic Spatial Inc., used under the Ingress Terms of Service.',
     disclaimerShort: 'Unofficial · made by Shenzhen RES · mission © 佛山 MD 筹划组 · art © Agent HTMSK · portals © Niantic Spatial.',
     coordChooserAria: 'Choose coordinate system',
     coordChooserTitle: 'Open in Apple Maps',
@@ -62,6 +65,9 @@ const I18N = {
     pageTitleSuffix: '任务日地图',
     languageAria: '语言',
     missionsAria: '任务列表',
+    viewSwitchAria: '任务列表显示方式',
+    viewListAria: '列表视图',
+    viewGridAria: '网格视图',
     mapAria: '地图',
     closeAria: '关闭',
     collapseAria: '收起面板,显示完整地图',
@@ -95,7 +101,7 @@ const I18N = {
     fatalNoToken: '未配置 MapKit 令牌。请将 public/mapkit-token.example.js 复制为 public/mapkit-token.js 并粘贴 JWT。',
     fatalAuth: '无法通过 MapKit 验证。',
     missionMeta: (n, p, b) => `${n} 项任务 · ${p} 个据点 · 拼图 ${b}`,
-    disclaimer: '本网站由深圳 RES(蓝军)特工社区制作,作为佛山任务日的第三方辅助工具发布。非官方网站,与 Niantic Spatial 公司及 FSMD 主办方均无任何关联或背书。版权署名:任务集策划 © 佛山 MD 筹划组;任务名称 by 特工 茶几;任务图片及活动美术 by 特工 HTMSK;据点资料 © Niantic Spatial Inc.,依据 Ingress 服务条款使用。',
+    disclaimer: '本网站由深圳 RES(蓝军)特工社区制作,作为佛山任务日的第三方辅助工具发布。非官方网站,与 Niantic Spatial 公司及 FSMD 主办方均无任何关联或背书。版权署名:任务集策划、命名与简介 © 佛山 MD 筹划组;任务图片及活动美术 by 特工 HTMSK;据点资料 © Niantic Spatial Inc.,依据 Ingress 服务条款使用。',
     disclaimerShort: '非官方 · 由深圳 RES 制作 · 任务 © 佛山 MD 筹划组 · 美术 © 特工 HTMSK · 据点 © Niantic Spatial',
     coordChooserAria: '选择坐标系',
     coordChooserTitle: '在 Apple 地图中打开',
@@ -109,6 +115,9 @@ const I18N = {
     pageTitleSuffix: 'ミッションデイ・マップ',
     languageAria: '言語',
     missionsAria: 'ミッション一覧',
+    viewSwitchAria: 'ミッション表示モード',
+    viewListAria: 'リスト表示',
+    viewGridAria: 'グリッド表示',
     mapAria: 'マップ',
     closeAria: '閉じる',
     collapseAria: 'パネルを折りたたんでマップを表示',
@@ -142,7 +151,7 @@ const I18N = {
     fatalNoToken: 'MapKit トークンが未設定です。public/mapkit-token.example.js を public/mapkit-token.js にコピーして JWT を貼り付けてください。',
     fatalAuth: 'MapKit の認証に失敗しました。',
     missionMeta: (n, p, b) => `${n} ミッション · ${p} ポータル · バナー ${b}`,
-    disclaimer: '本サイトは深圳 RES（レジスタンス）のエージェント有志が Foshan Mission Day のサードパーティ補助ツールとして制作した非公式サイトです。Niantic Spatial 社および FSMD 主催者とは一切関係ありません。クレジット:ミッションセット企画 © 佛山 MD 筹划组 (Foshan MD 組織委員会);ミッション名称 by エージェント 茶几;バナー画像・イベントアート by エージェント HTMSK;ポータルデータ © Niantic Spatial Inc.、Ingress 利用規約に基づき使用。',
+    disclaimer: '本サイトは深圳 RES（レジスタンス）のエージェント有志が Foshan Mission Day のサードパーティ補助ツールとして制作した非公式サイトです。Niantic Spatial 社および FSMD 主催者とは一切関係ありません。クレジット:ミッションセット企画・名称・説明 © 佛山 MD 筹划组 (Foshan MD 組織委員会);バナー画像・イベントアート by エージェント HTMSK;ポータルデータ © Niantic Spatial Inc.、Ingress 利用規約に基づき使用。',
     disclaimerShort: '非公式 · 深圳 RES 制作 · ミッション © 佛山 MD 筹划组 · アート © エージェント HTMSK · ポータル © Niantic Spatial',
     coordChooserAria: '座標系を選択',
     coordChooserTitle: 'Apple マップで開く',
@@ -164,6 +173,14 @@ function initialLang() {
   return 'en';
 }
 
+function initialViewMode() {
+  try {
+    const stored = localStorage.getItem('missionViewMode');
+    if (stored === 'list' || stored === 'grid') return stored;
+  } catch { /* localStorage may throw in private mode */ }
+  return 'list';
+}
+
 function t() {
   return I18N[state.lang] || I18N.en;
 }
@@ -174,6 +191,7 @@ const state = {
   blogs: {},    // mission order → { title_zh, title_en, url_zh, url_en }
   ingressMissions: {}, // mission order → link.ingress.com/mission/...
   missionPictures: {}, // mission order → lh3.googleusercontent.com banner URL
+  viewMode: 'list',    // 'list' or 'grid' — toggled via #view-list / #view-grid
   map: null,
   lang: 'en',  // overwritten on bootstrap from localStorage / browser
   /** @type {{overlays:any[], annotations:any[]}} */
@@ -185,6 +203,9 @@ const els = {
   setTitle:    document.getElementById('set-title'),
   setMeta:     document.getElementById('set-meta'),
   list:        document.getElementById('mission-list'),
+  grid:        document.getElementById('mission-grid'),
+  viewList:    document.getElementById('view-list'),
+  viewGrid:    document.getElementById('view-grid'),
   showAll:     document.getElementById('show-all'),
   detail:      document.getElementById('detail'),
   detailTitle: document.getElementById('detail-title'),
@@ -216,6 +237,7 @@ let pendingMapsRequest = null;
 // Apply i18n + wire the switcher before MapKit finishes loading, so the
 // chrome is in the right language from the first paint.
 state.lang = initialLang();
+state.viewMode = initialViewMode();
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', bootstrapChrome, { once: true });
 } else {
@@ -452,6 +474,10 @@ async function bootstrap() {
 
   fitToBounds(state.data.bounds);
   buildMissionList();
+  buildMissionGrid();
+  setViewMode(state.viewMode);
+  if (els.viewList) els.viewList.addEventListener('click', () => setViewMode('list'));
+  if (els.viewGrid) els.viewGrid.addEventListener('click', () => setViewMode('grid'));
   els.showAll.addEventListener('click', () => selectMission('all'));
   // Closing the detail panel returns to the full-banner overview so the
   // other missions are visible again — but keep the current camera so the
@@ -481,6 +507,37 @@ function buildMissionList() {
   }
 }
 
+function buildMissionGrid() {
+  if (!els.grid) return;
+  els.grid.innerHTML = '';
+  for (const m of state.data.missions) {
+    const cell = document.createElement('button');
+    cell.type = 'button';
+    cell.className = 'mission-grid-cell';
+    cell.dataset.order = String(m.order);
+    const picUrl = state.missionPictures[String(m.order)];
+    const img = picUrl
+      ? `<img loading="lazy" src="${IMAGE_PROXY}${encodeURIComponent(picUrl)}" alt="">`
+      : '<span></span>';
+    cell.innerHTML = `
+      ${img}
+      <span class="mission-grid-cell-num">${m.order}</span>
+      <span class="mission-grid-cell-overlay">${escapeHtml(missionLabel(m))}</span>`;
+    cell.addEventListener('click', () => selectMission(m.order));
+    els.grid.appendChild(cell);
+  }
+}
+
+function setViewMode(mode) {
+  if (mode !== 'list' && mode !== 'grid') return;
+  state.viewMode = mode;
+  try { localStorage.setItem('missionViewMode', mode); } catch { /* ignore */ }
+  if (els.list) els.list.hidden = (mode !== 'list');
+  if (els.grid) els.grid.hidden = (mode !== 'grid');
+  if (els.viewList) els.viewList.classList.toggle('active', mode === 'list');
+  if (els.viewGrid) els.viewGrid.classList.toggle('active', mode === 'grid');
+}
+
 function missionLabel(m) {
   return m.displayName || m.firstPortal || m.title || `Mission ${m.order}`;
 }
@@ -503,6 +560,11 @@ function selectMission(order, opts = {}) {
   state.selected = order;
   for (const li of els.list.children) {
     li.classList.toggle('active', li.dataset.order === String(order));
+  }
+  if (els.grid) {
+    for (const cell of els.grid.children) {
+      cell.classList.toggle('active', cell.dataset.order === String(order));
+    }
   }
   clearLayers();
   if (order === 'all') {

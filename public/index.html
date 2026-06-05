@@ -63,10 +63,19 @@
 
     <div class="controls">
       <button id="show-all" type="button" data-i18n="showAll">Show full banner</button>
+      <div class="view-switch" role="group" data-i18n-aria-label="viewSwitchAria" aria-label="Mission list view">
+        <button id="view-list" type="button" data-view="list"
+                data-i18n-aria-label="viewListAria" aria-label="List view"
+                title="List view">☰</button>
+        <button id="view-grid" type="button" data-view="grid"
+                data-i18n-aria-label="viewGridAria" aria-label="Grid view"
+                title="Grid view">▦</button>
+      </div>
       <button id="show-welcome" type="button" class="link-btn" data-i18n="showWelcome" data-i18n-aria-label="showWelcomeAria" aria-label="About this event">ℹ︎ About this event</button>
     </div>
 
     <ol id="mission-list" data-i18n-aria-label="missionsAria" aria-label="Missions"></ol>
+    <div id="mission-grid" data-i18n-aria-label="missionsAria" aria-label="Missions" hidden></div>
 
     <footer>
       <p class="note" id="footer-hint" data-i18n="footerHint">Tap any mission to see details.</p>

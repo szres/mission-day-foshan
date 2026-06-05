@@ -109,6 +109,101 @@ body {
   overflow-y: auto;
   flex: 1;
 }
+#mission-list[hidden] { display: none; }
+
+/* Grid view — 2-column thumbnail layout of mission banner pictures.
+   Toggles with the list view via the view-switch in .controls. */
+#mission-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  padding: 10px 14px;
+  margin: 0;
+  overflow-y: auto;
+  flex: 1;
+  align-content: start;
+}
+#mission-grid[hidden] { display: none; }
+.mission-grid-cell {
+  position: relative;
+  display: block;
+  aspect-ratio: 1 / 1;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--panel-2);
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color 0.12s ease, transform 0.05s ease;
+}
+.mission-grid-cell:hover { border-color: var(--accent); }
+.mission-grid-cell:active { transform: translateY(1px); }
+.mission-grid-cell.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(0,194,255,0.35);
+}
+.mission-grid-cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.mission-grid-cell-overlay {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 14px 8px 6px;
+  background: linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0) 100%);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: #fff;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.mission-grid-cell-num {
+  position: absolute;
+  top: 4px; left: 4px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(11,14,20,0.85);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* View-switch — compact list/grid icon toggle. Lives inside .controls. */
+.view-switch {
+  display: inline-flex;
+  margin-top: 8px;
+  gap: 2px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.view-switch button {
+  flex: 1;
+  background: var(--panel-2);
+  color: var(--muted);
+  border: none;
+  border-radius: 0 !important;
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  line-height: 1;
+}
+.view-switch button.active {
+  background: var(--bg);
+  color: var(--accent);
+}
+.view-switch button:hover { color: var(--accent); }
 
 #mission-list li {
   padding: 8px 18px;
