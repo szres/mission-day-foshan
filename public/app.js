@@ -521,11 +521,8 @@ function buildMissionGrid() {
     const picUrl = state.missionPictures[String(m.order)];
     const img = picUrl
       ? `<img loading="lazy" src="${IMAGE_PROXY}${encodeURIComponent(picUrl)}" alt="">`
-      : '<span></span>';
-    cell.innerHTML = `
-      ${img}
-      <span class="mission-grid-cell-num">${m.order}</span>
-      <span class="mission-grid-cell-overlay">${escapeHtml(missionLabel(m))}</span>`;
+      : '';
+    cell.innerHTML = img;
     cell.addEventListener('click', () => selectMission(m.order));
     els.grid.appendChild(cell);
   }
