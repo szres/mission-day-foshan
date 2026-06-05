@@ -117,33 +117,38 @@ body {
 #mission-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 3px;
-  padding: 8px 10px 14px;
+  gap: 6px;
+  padding: 10px 12px 16px;
   margin: 0;
   overflow-y: auto;
   flex: 1;
   align-content: start;
 }
 #mission-grid[hidden] { display: none; }
+/* Circular medallion-style tiles, mirroring the Ingress mission-medal
+   view inside the in-game scanner. */
 .mission-grid-cell {
   position: relative;
   display: block;
   padding: 0;
   aspect-ratio: 1 / 1;
-  border: 1px solid var(--border);
-  border-radius: 3px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
   overflow: hidden;
   background: var(--panel-2);
   cursor: pointer;
   text-decoration: none;
   color: var(--text);
-  transition: border-color 0.12s ease, transform 0.05s ease;
+  transition: border-color 0.12s ease, transform 0.05s ease, box-shadow 0.12s ease;
 }
-.mission-grid-cell:hover { border-color: var(--accent); }
-.mission-grid-cell:active { transform: translateY(1px); }
+.mission-grid-cell:hover {
+  border-color: var(--accent);
+  transform: scale(1.05);
+}
+.mission-grid-cell:active { transform: scale(0.97); }
 .mission-grid-cell.active {
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(0,194,255,0.5);
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px rgba(0,194,255,0.55);
   z-index: 1;
 }
 .mission-grid-cell img {
@@ -152,41 +157,48 @@ body {
   object-fit: cover;
   display: block;
 }
+/* Mission number badge — small disc in the bottom-right corner,
+   echoing the position of the count badge on Ingress mission medals. */
 .mission-grid-cell-num {
   position: absolute;
-  top: 2px; left: 2px;
-  min-width: 14px;
-  height: 14px;
-  padding: 0 3px;
+  right: -1px;
+  bottom: -1px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(11,14,20,0.85);
+  background: var(--bg);
   color: var(--accent);
   font-size: 9px;
   font-weight: 700;
-  border-radius: 2px;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
   font-variant-numeric: tabular-nums;
   line-height: 1;
+  box-sizing: border-box;
 }
-/* Name overlay only on hover, since cells are too small for a permanent
-   label. The browser tooltip (title attribute) provides the same info
-   for touch users on long-press. */
+/* Hover/active label tooltip floating below the medallion. Doesn't
+   clip with the circular overflow because it's positioned outside. */
 .mission-grid-cell-overlay {
   position: absolute;
-  left: 0; right: 0; bottom: 0;
-  padding: 14px 4px 4px;
-  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%);
+  left: 50%;
+  bottom: -22px;
+  transform: translateX(-50%);
+  padding: 3px 8px;
+  background: rgba(11,14,20,0.96);
+  border: 1px solid var(--border);
+  border-radius: 4px;
   font-size: 10px;
   font-weight: 500;
   line-height: 1.2;
   color: #fff;
-  text-overflow: ellipsis;
   white-space: nowrap;
-  overflow: hidden;
   opacity: 0;
   transition: opacity 0.12s ease;
   pointer-events: none;
+  z-index: 10;
 }
 .mission-grid-cell:hover .mission-grid-cell-overlay,
 .mission-grid-cell.active .mission-grid-cell-overlay { opacity: 1; }
