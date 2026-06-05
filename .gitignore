@@ -14,3 +14,7 @@ headimg.png
 # Generated planning artefacts (not deployed; not part of the published site)
 checklist.csv
 checklist.md
+
+# Third-party PDFs (e.g. the organisers' official mission-overview booklet).
+# Stays on disk for local use / private sharing; never published or committed.
+*.pdf
