@@ -515,6 +515,9 @@ function buildMissionGrid() {
     cell.type = 'button';
     cell.className = 'mission-grid-cell';
     cell.dataset.order = String(m.order);
+    const label = `#${m.order} · ${missionLabel(m)}`;
+    cell.title = label;
+    cell.setAttribute('aria-label', label);
     const picUrl = state.missionPictures[String(m.order)];
     const img = picUrl
       ? `<img loading="lazy" src="${IMAGE_PROXY}${encodeURIComponent(picUrl)}" alt="">`
