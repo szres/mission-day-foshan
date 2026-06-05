@@ -186,6 +186,27 @@ body {
 
 #detail h2 { margin: 0 0 8px; font-size: 15px; padding-right: 24px; }
 
+/* Mission banner image lives next to the title in a flex row so the
+   sticky title pinning logic on mobile still works (h2 remains a direct
+   child of #detail in the desktop case; the wrapper is purely visual). */
+.detail-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.detail-title-row h2 { margin: 0; flex: 1 1 auto; min-width: 0; }
+#detail-picture {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  object-fit: cover;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+}
+#detail-picture[hidden] { display: none; }
+
 .detail-actions {
   margin: 4px 0 12px;
 }
@@ -674,9 +695,11 @@ body.modal-open { overflow: hidden; }
     max-height: none;
     min-height: 0;
   }
-  /* Pin the mission title so users always know which mission they are
-     looking at, even when they scroll deep into the portal list. */
-  #detail h2 {
+  /* Pin the mission title + banner image so users always know which
+     mission they are looking at, even when they scroll deep into the
+     portal list. Sticky must live on the wrapper (direct child of
+     #detail, the scroll container), not on the h2 inside it. */
+  #detail .detail-title-row {
     position: sticky;
     top: -22px;
     margin: -22px -18px 8px;
@@ -684,6 +707,7 @@ body.modal-open { overflow: hidden; }
     background: var(--panel);
     z-index: 3;
   }
+  #detail .detail-title-row h2 { padding-right: 0; }
   #detail.collapsed {
     height: 44px;
     padding-top: 14px;

@@ -48,8 +48,8 @@ const I18N = {
     fatalNoToken: 'No MapKit token configured. Copy public/mapkit-token.example.js → public/mapkit-token.js and paste your JWT.',
     fatalAuth: 'Could not authenticate with MapKit.',
     missionMeta: (n, p, b) => `${n} missions · ${p} portals · banner ${b}`,
-    disclaimer: 'Built by Shenzhen RES (Resistance) agents as a third-party companion to Mission Day Foshan. Not an official site — not affiliated with or endorsed by Niantic or the FSMD organisers.',
-    disclaimerShort: 'Unofficial · made by Shenzhen RES · not affiliated with Niantic or FSMD organisers.',
+    disclaimer: 'Built by Shenzhen RES (Resistance) agents as a third-party companion to Mission Day Foshan. Not an official site — not affiliated with or endorsed by Niantic or the FSMD organisers. Mission set names, portal data and banner artwork are © 佛山 MD 筹划组 (Foshan MD Organizing Committee); used here with attribution for community navigation.',
+    disclaimerShort: 'Unofficial · made by Shenzhen RES · mission content © 佛山 MD 筹划组 · not affiliated with Niantic.',
     coordChooserAria: 'Choose coordinate system',
     coordChooserTitle: 'Open in Apple Maps',
     coordChooserNote: "Apple Maps in mainland China renders against GCJ-02. Opening WGS-84 coordinates there shifts the pin by ~50–500 m. Choose GCJ-02 if you're in China, WGS-84 elsewhere.",
@@ -95,8 +95,8 @@ const I18N = {
     fatalNoToken: '未配置 MapKit 令牌。请将 public/mapkit-token.example.js 复制为 public/mapkit-token.js 并粘贴 JWT。',
     fatalAuth: '无法通过 MapKit 验证。',
     missionMeta: (n, p, b) => `${n} 项任务 · ${p} 个据点 · 拼图 ${b}`,
-    disclaimer: '本网站由深圳 RES(蓝军)特工社区制作,作为佛山任务日的第三方辅助工具发布。非官方网站,与 Niantic 公司及 FSMD 主办方均无任何关联或背书。',
-    disclaimerShort: '非官方 · 由深圳 RES 制作 · 与 Niantic 及 FSMD 主办方无关',
+    disclaimer: '本网站由深圳 RES(蓝军)特工社区制作,作为佛山任务日的第三方辅助工具发布。非官方网站,与 Niantic 公司及 FSMD 主办方均无任何关联或背书。任务集名称、据点信息及任务图等内容版权归 佛山 MD 筹划组所有,本站在保留署名的前提下用于社区导览。',
+    disclaimerShort: '非官方 · 由深圳 RES 制作 · 任务内容版权 © 佛山 MD 筹划组 · 与 Niantic 无关',
     coordChooserAria: '选择坐标系',
     coordChooserTitle: '在 Apple 地图中打开',
     coordChooserNote: '中国大陆的 Apple 地图采用 GCJ-02 坐标系,直接打开 WGS-84 坐标会出现约 50–500 米的偏移。若在中国大陆,请选择 GCJ-02;其他地区请选择 WGS-84。',
@@ -142,8 +142,8 @@ const I18N = {
     fatalNoToken: 'MapKit トークンが未設定です。public/mapkit-token.example.js を public/mapkit-token.js にコピーして JWT を貼り付けてください。',
     fatalAuth: 'MapKit の認証に失敗しました。',
     missionMeta: (n, p, b) => `${n} ミッション · ${p} ポータル · バナー ${b}`,
-    disclaimer: '本サイトは深圳 RES（レジスタンス）のエージェント有志が Foshan Mission Day のサードパーティ補助ツールとして制作した非公式サイトです。Niantic 社および FSMD 主催者とは一切関係ありません。',
-    disclaimerShort: '非公式 · 深圳 RES 制作 · Niantic / FSMD 主催者とは無関係',
+    disclaimer: '本サイトは深圳 RES（レジスタンス）のエージェント有志が Foshan Mission Day のサードパーティ補助ツールとして制作した非公式サイトです。Niantic 社および FSMD 主催者とは一切関係ありません。ミッションセット名称、ポータル情報、バナー画像などのコンテンツの著作権は 佛山 MD 筹划组 (Foshan MD 組織委員会) に帰属し、本サイトでは出典を明記したうえでコミュニティ案内目的で使用しています。',
+    disclaimerShort: '非公式 · 深圳 RES 制作 · ミッションコンテンツ © 佛山 MD 筹划组 · Niantic とは無関係',
     coordChooserAria: '座標系を選択',
     coordChooserTitle: 'Apple マップで開く',
     coordChooserNote: '中国本土の Apple マップは GCJ-02 座標系を使用しているため、WGS-84 のまま開くとピンが約 50〜500m ずれます。中国本土なら GCJ-02、それ以外の地域なら WGS-84 を選んでください。',
@@ -173,6 +173,7 @@ const state = {
   guides: {},   // mission order → maps.apple/ug/... URL
   blogs: {},    // mission order → { title_zh, title_en, url_zh, url_en }
   ingressMissions: {}, // mission order → link.ingress.com/mission/...
+  missionPictures: {}, // mission order → lh3.googleusercontent.com banner URL
   map: null,
   lang: 'en',  // overwritten on bootstrap from localStorage / browser
   /** @type {{overlays:any[], annotations:any[]}} */
@@ -193,6 +194,7 @@ const els = {
   openInMaps:  document.getElementById('open-in-maps'),
   openMissionIngress: document.getElementById('open-mission-ingress'),
   openBlog:    document.getElementById('open-blog'),
+  detailPicture: document.getElementById('detail-picture'),
   welcome:     document.getElementById('welcome'),
   welcomeBlogs:document.getElementById('welcome-blogs'),
   showWelcome: document.getElementById('show-welcome'),
@@ -410,7 +412,7 @@ function applyI18n() {
 }
 
 async function bootstrap() {
-  const [missionsRes, guidesRaw, blogsRaw, ingressRaw] = await Promise.all([
+  const [missionsRes, guidesRaw, blogsRaw, ingressRaw, picturesRaw] = await Promise.all([
     fetch('/missions.json', { cache: 'no-cache' }),
     fetch('/guides.json', { cache: 'no-cache' })
       .then(r => r.ok ? r.json() : {}).catch(() => ({})),
@@ -418,12 +420,15 @@ async function bootstrap() {
       .then(r => r.ok ? r.json() : {}).catch(() => ({})),
     fetch('/ingress-missions.json', { cache: 'no-cache' })
       .then(r => r.ok ? r.json() : {}).catch(() => ({})),
+    fetch('/mission-pictures.json', { cache: 'no-cache' })
+      .then(r => r.ok ? r.json() : {}).catch(() => ({})),
   ]);
   if (!missionsRes.ok) throw new Error(`missions.json ${missionsRes.status}`);
   state.data = await missionsRes.json();
   state.guides = sanitizeGuides(guidesRaw);
   state.blogs = sanitizeBlogs(blogsRaw);
   state.ingressMissions = sanitizeIngressMissions(ingressRaw);
+  state.missionPictures = sanitizeMissionPictures(picturesRaw);
   renderWelcomeBlogs();
 
   els.setTitle.textContent = state.data.setName;
@@ -669,6 +674,18 @@ function renderMission(mission) {
 function showDetailPanel(mission) {
   const tr = t();
   els.detailTitle.textContent = `${tr.missionPrefix} ${mission.order} · ${missionLabel(mission)}`;
+  // Mission banner image (the Niantic-issued mission "picture"). Routed
+  // through /api/portal-image so the lh3.googleusercontent.com hostname
+  // never appears in the page CSP and benefits from the same 30-day cache.
+  const picUrl = state.missionPictures[String(mission.order)];
+  if (picUrl && els.detailPicture) {
+    els.detailPicture.src = IMAGE_PROXY + encodeURIComponent(picUrl);
+    els.detailPicture.alt = missionFullName(mission);
+    els.detailPicture.hidden = false;
+  } else if (els.detailPicture) {
+    els.detailPicture.hidden = true;
+    els.detailPicture.removeAttribute('src');
+  }
   const guideUrl = state.guides[mission.order];
   if (guideUrl) {
     // Pre-curated Apple Maps Guide — coords are already baked into the guide
@@ -908,6 +925,18 @@ function sanitizeIngressMissions(raw) {
     if (k.startsWith('_')) continue;
     if (typeof v !== 'string') continue;
     if (!/^https:\/\/link\.ingress\.com\/mission\//.test(v)) continue;
+    out[k] = v;
+  }
+  return out;
+}
+
+function sanitizeMissionPictures(raw) {
+  const out = {};
+  if (!raw || typeof raw !== 'object') return out;
+  for (const [k, v] of Object.entries(raw)) {
+    if (k.startsWith('_')) continue;
+    if (typeof v !== 'string') continue;
+    if (!/^https:\/\/lh3\.googleusercontent\.com\//.test(v)) continue;
     out[k] = v;
   }
   return out;
