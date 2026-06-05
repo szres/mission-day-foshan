@@ -31,6 +31,7 @@ const I18N = {
     travelSection: 'Travel & accommodation',
     enterMap: 'Enter the map →',
     readBlog: '📖 Read mission blog ↗',
+    openMissionIngress: '⬢ Open mission in Ingress ↗',
     detailHint: 'Tap any portal to plan walking directions in Apple Maps.',
     viewArea: 'View Area in Apple Maps ↗',
     openGuide: 'Open Mission Guide ↗',
@@ -77,6 +78,7 @@ const I18N = {
     travelSection: '交通与住宿',
     enterMap: '进入地图 →',
     readBlog: '📖 阅读任务介绍 ↗',
+    openMissionIngress: '⬢ 在 Ingress 中打开任务 ↗',
     footerHint: '点击任一任务查看详情,可在 Apple 地图中打开多点步行导航。',
     detailHint: '点击任一据点可在 Apple 地图中规划步行路线。',
     viewArea: '在 Apple 地图中查看任务区域 ↗',
@@ -123,6 +125,7 @@ const I18N = {
     travelSection: '交通・宿泊',
     enterMap: 'マップを開く →',
     readBlog: '📖 ミッション解説を読む ↗',
+    openMissionIngress: '⬢ Ingress でミッションを開く ↗',
     footerHint: 'ミッションをタップして詳細を表示し、Apple マップで複数地点の徒歩ナビを開けます。',
     detailHint: 'ポータルをタップして Apple マップで徒歩ルートを開きます。',
     viewArea: 'Apple マップでエリアを表示 ↗',
@@ -169,6 +172,7 @@ const state = {
   data: null,
   guides: {},   // mission order → maps.apple/ug/... URL
   blogs: {},    // mission order → { title_zh, title_en, url_zh, url_en }
+  ingressMissions: {}, // mission order → link.ingress.com/mission/...
   map: null,
   lang: 'en',  // overwritten on bootstrap from localStorage / browser
   /** @type {{overlays:any[], annotations:any[]}} */
@@ -187,6 +191,7 @@ const els = {
   detailClose: document.getElementById('detail-close'),
   detailHandle:document.getElementById('detail-handle'),
   openInMaps:  document.getElementById('open-in-maps'),
+  openMissionIngress: document.getElementById('open-mission-ingress'),
   openBlog:    document.getElementById('open-blog'),
   welcome:     document.getElementById('welcome'),
   welcomeBlogs:document.getElementById('welcome-blogs'),
@@ -405,17 +410,20 @@ function applyI18n() {
 }
 
 async function bootstrap() {
-  const [missionsRes, guidesRaw, blogsRaw] = await Promise.all([
+  const [missionsRes, guidesRaw, blogsRaw, ingressRaw] = await Promise.all([
     fetch('/missions.json', { cache: 'no-cache' }),
     fetch('/guides.json', { cache: 'no-cache' })
       .then(r => r.ok ? r.json() : {}).catch(() => ({})),
     fetch('/blogs.json', { cache: 'no-cache' })
+      .then(r => r.ok ? r.json() : {}).catch(() => ({})),
+    fetch('/ingress-missions.json', { cache: 'no-cache' })
       .then(r => r.ok ? r.json() : {}).catch(() => ({})),
   ]);
   if (!missionsRes.ok) throw new Error(`missions.json ${missionsRes.status}`);
   state.data = await missionsRes.json();
   state.guides = sanitizeGuides(guidesRaw);
   state.blogs = sanitizeBlogs(blogsRaw);
+  state.ingressMissions = sanitizeIngressMissions(ingressRaw);
   renderWelcomeBlogs();
 
   els.setTitle.textContent = state.data.setName;
@@ -445,6 +453,10 @@ async function bootstrap() {
   // user doesn't lose the zoom level / position they were inspecting.
   // The "Show full banner" button still re-fits the full banner.
   els.detailClose.addEventListener('click', () => selectMission('all', { keepCamera: true }));
+
+  if (els.openMissionIngress) {
+    els.openMissionIngress.addEventListener('click', () => showToast(t().toastOpeningIngress));
+  }
 
   selectMission('all');
 }
@@ -681,6 +693,17 @@ function showDetailPanel(mission) {
     };
     els.openInMaps.textContent = tr.viewArea;
   }
+  // Per-mission Ingress deeplink — universal link that opens the mission
+  // in the Ingress scanner on iOS/Android (or a fallback web page elsewhere).
+  const ingressUrl = state.ingressMissions[String(mission.order)];
+  if (ingressUrl && els.openMissionIngress) {
+    els.openMissionIngress.href = ingressUrl;
+    els.openMissionIngress.textContent = tr.openMissionIngress;
+    els.openMissionIngress.hidden = false;
+  } else if (els.openMissionIngress) {
+    els.openMissionIngress.hidden = true;
+    els.openMissionIngress.removeAttribute('href');
+  }
   // Per-mission blog link
   const blog = state.blogs[String(mission.order)];
   if (blog) {
@@ -873,6 +896,18 @@ function sanitizeGuides(raw) {
     if (k.startsWith('_')) continue;
     if (typeof v !== 'string') continue;
     if (!/^https:\/\/maps\.apple\/(ug|p)\//.test(v)) continue;
+    out[k] = v;
+  }
+  return out;
+}
+
+function sanitizeIngressMissions(raw) {
+  const out = {};
+  if (!raw || typeof raw !== 'object') return out;
+  for (const [k, v] of Object.entries(raw)) {
+    if (k.startsWith('_')) continue;
+    if (typeof v !== 'string') continue;
+    if (!/^https:\/\/link\.ingress\.com\/mission\//.test(v)) continue;
     out[k] = v;
   }
   return out;
